@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from datetime import datetime
 
 cluster = MongoClient("mongodb+srv://dbBot:admin@cluster0.yn32au7.mongodb.net/?retryWrites=true&w=majority")
-db = cluster["bakery"]
+db = cluster["salgados"]
 users = db["users"]
 orders = db["orders"]
 
