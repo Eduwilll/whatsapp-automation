@@ -18,7 +18,8 @@ def reply():
     res = MessagingResponse()
     user = users.find_one({"number": number})
     if bool(user) == False:
-        res.message("Oi, obrigado por nos contatar *Salgados S.A*\n Você pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para nos *contatar*\n2️⃣  Para *pedir* salgados\n3️⃣  Para saber o *horário de funcionamento*\n4️⃣  Para saber nosso *endereço*")
+        msg = res.message("Oi, obrigado por nos contatar *Salgados S.A*\n Você pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para nos *contatar*\n2️⃣  Para *pedir* salgados\n3️⃣  Para saber o *horário de funcionamento*\n4️⃣  Para saber nosso *endereço*")
+        msg.media("https://i.ibb.co/tqYmh9R/1628253583441.jpg")
         users.insert_one({"number": number, "status": "main", "messages": []})
     elif user["status"] == "main":
         try:
