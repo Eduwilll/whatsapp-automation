@@ -64,7 +64,7 @@ def reply():
         select = user["item"]
         res.message("Obrigado por ter comprado conosco!😀🎈s")
         mgs2 = res.message(f"Seu pedido de *{select}* foi *recebido* e será entregue no maximo de *1 hora*")
-        mgs2 = res.media("https://i.ibb.co/3mZrnMt/rickroll.gif")
+        mgs2 = res.media("https://i.ibb.co/tqYmh9R/1628253583441.jpg")
         orders.insert_one({"number":number,"item":select,"address":text,"order_time": datetime.now()})
         users.update_one({"number": number}, {"$set": {"status": "ordered"}})
     elif user['status'] == "ordered":
