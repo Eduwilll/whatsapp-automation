@@ -64,12 +64,12 @@ def reply():
         select = user["item"]
         res.message("Obrigado por ter comprado conosco!😀🎈s")
         res.message(f"Seu pedido de *{select}* foi *recebido* e será entregue no maximo de *1 hora*")
+        res.message("https://i.ibb.co/3mZrnMt/rickroll.gif")
         orders.insert_one({"number":number,"item":select,"address":text,"order_time": datetime.now()})
         users.update_one({"number": number}, {"$set": {"status": "ordered"}})
     elif user['status'] == "ordered":
-        msg1 = res.message(
+        res.message(
             "Oi, obrigado por nos contatar novamente *Salgados S.A*\nVocê pode escolher uma das opções abaixo\n\n*Digite o numero* correspodente:\n\n1️⃣  Para nos *contatar*\n2️⃣  Para *pedir* salgados\n3️⃣  Para saber o *horário de funcionamento*\n4️⃣  Para saber nosso *endereço*")
-        msg1.media("https://i.ibb.co/3mZrnMt/rickroll.gif")
         users.update_one({"number": number}, {"$set": {"status": "main"}})
     users.update_one({"number": number}, {"$push": {"messages": {"text": text, "date": datetime.now()}}})
 
