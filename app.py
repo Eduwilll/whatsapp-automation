@@ -66,7 +66,8 @@ def reply():
         res.message(f"Seu pedido de *{select}* foi *recebido* e será entregue no maximo de *1 hora*")
         orders.insert_one({"number":number,"item":select,"address":text,"order_time": datetime.now()})
         users.update_one({"number": number}, {"$set": {"status": "ordered"}})
-        res.media("https://i.ibb.co/tqYmh9R/1628253583441.jpg")
+        msg2 = res.message("Test")
+        msg2.media("https://i.ibb.co/tqYmh9R/1628253583441.jpg")
     elif user['status'] == "ordered":
         res.message(
             "Oi, obrigado por nos contatar novamente *Salgados S.A*\nVocê pode escolher uma das opções abaixo\n\n*Digite o numero* correspodente:\n\n1️⃣  Para nos *contatar*\n2️⃣  Para *pedir* salgados\n3️⃣  Para saber o *horário de funcionamento*\n4️⃣  Para saber nosso *endereço*")
