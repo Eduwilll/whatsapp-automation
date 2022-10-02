@@ -81,15 +81,10 @@ def reply():
     elif user["status"] == "main-reclama":
         complaints.insert_one({"number": number, "complaint": text, "name": profileName, "complaint_time": datetime.now()})
         res.message('Sua duvida/reclamação foi registrada.')
-        try:
-            option = int(text)
-        except:
-            res.message("Por Favor digite um numero válido")
-            return str(res)
-        if option == 1:
-            users.update_one({"number": number}, {"$set": {"status": "main"}})
-            res.message(
-                "Você pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar")
+        users.update_one({"number": number}, {"$set": {"status": "main"}})
+        res.message(
+            "Você pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar")
+
     elif user["status"] == "main-sair":
         try:
             option = int(text)
@@ -129,4 +124,4 @@ def reply():
     users.update_one({"number": number}, {"$push": {"messages": {"text": text, "date": datetime.now()}}})
     return str(res)
 if __name__ == "__main__":
-    app.run()
+    app.run(port=5000)
