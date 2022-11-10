@@ -28,7 +28,7 @@ def reply():
 
     #Caso não é encontrado o numero é acionado
     if bool(user) == False:
-        msg = res.message("Oi, obrigado por nos contatar *Salgados S.A*\nVocê pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar")
+        msg = res.message("Oi, obrigado por nos contatar *Salgados S.A*\nVocê pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar \n\n⚠ Serão coletados dados como *Nº de Telefone*, *Nome de Perfil* e *Menssagens*, Você poderá excluir esses dados do nosso banco de dados apertando 6️⃣ para Finalizar!")
         msg.media("https://i.ibb.co/tqYmh9R/1628253583441.jpg")
         users.insert_one({"number": number,"ProfileName":profileName ,"channel":"whatsapp" ,"status": "main", "messages": []})
 
