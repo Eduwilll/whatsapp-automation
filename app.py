@@ -2,7 +2,7 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse,Message
 from pymongo import MongoClient
 from datetime import datetime
-from pycep_correios import get_address_from_cep, WebService
+from pycep_correios import get_address_from_cep, WebService, exceptions
 
 cluster = MongoClient("mongodb+srv://dbBot:admin@cluster0.yn32au7.mongodb.net/?retryWrites=true&w=majority") # endereço do mangodb
 db = cluster["salgados"] #Banco de dados
@@ -28,7 +28,7 @@ def reply():
 
     #Caso não é encontrado o numero é acionado
     if bool(user) == False:
-        msg = res.message("Oi, obrigado por nos contatar *Salgados S.A*\nVocê pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar \n\n⚠ Serão coletados dados como *Nº de Telefone*, *Nome de Perfil* e *Menssagens*, Você poderá excluir esses dados do nosso banco de dados apertando 6️⃣ para Finalizar!")
+        msg = res.message("Oi, obrigado por nos contatar *Salgados S.A*\nVocê pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar")
         msg.media("https://i.ibb.co/tqYmh9R/1628253583441.jpg")
         users.insert_one({"number": number,"ProfileName":profileName ,"channel":"whatsapp" ,"status": "main", "messages": []})
 
@@ -67,11 +67,14 @@ def reply():
             res.message("Por Favor digite um numero válido")
             return str(res)
         if option == 1:
-            res.message("Lista dos Produtos:\n*Coxinha*\tRS10,00")
+            msg = res.message("Lista dos Produtos:\n*Coxinha*\tRS6,00\n*Esfiha*\tRS6,00\n*Pastel*\tRS10,00")
+            msg.media('https://i.pinimg.com/564x/72/01/06/72010685a0f1c48c4eff6e46f49f5ad6.jpg')
         elif option == 2:
-            res.message("Lista dos Combos e Kits:<\n*Coxinha*\tRS10,00")
+            msg1 = res.message("Lista dos Combos e Kits::\n*Coxinha*\tRS6,00\n*Esfiha*\tRS6,00\n*Pastel*\tRS10,00")
+            msg1.media('https://i.pinimg.com/564x/2b/65/58/2b65582f86c3ef419f7094de4482adeb.jpg')
         elif option == 3:
-            res.message("Lista das Promoções:\n*Coxinha*\tRS9,99")
+            msg2 = res.message("Lista das Promoções:\n*Coxinha* x4\tRS10,00\n*Esfiha* 4x\tRS10,00\n*Pastel* + *Refigerante 1L*\tRS10,00")
+            msg2.media('https://i.pinimg.com/564x/25/db/8d/25db8d6bf80f7e62906b4bd336681e4b.jpg')
         elif option == 4:
             users.update_one({"number": number}, {"$set": {"status": "main"}})
             res.message("Você pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar")
@@ -105,15 +108,43 @@ def reply():
         res.message('Sua nota foi registrada.')
         res.message("Obrigado por ter nos contato!😀🎈\nSeus dados Serão excluidos.")
     elif user["status"] == "address":
-        address = get_address_from_cep(text, webservice=WebService.APICEP)
-        res.message(f"Seu endereço: {address['logradouro']} - {address['bairro']}, {address['cidade']} - {address['uf']}, {address['cep']} \n {address['complemento']}")
-        users.update_one({"number": number}, {"$set": {"status": "ordered"}})
-        res.message("Digite 1 para voltar ao menu principal:")
+
         try:
             option = int(text)
+            address = get_address_from_cep(text, webservice=WebService.APICEP)
+
+        except exceptions.InvalidCEP as eic:
+            print(eic)
+            res.message("CEP *invalido!* ")
+
+        except exceptions.CEPNotFound as ecnf:
+            print(ecnf)
+            res.message("CEP NÃO ENCONTRADO! ")
+
+        except exceptions.ConnectionError as errc:
+            print(errc)
+            res.message("ERRO DE CONECÇÃO ")
+
+        except exceptions.Timeout as errt:
+            print(errt)
+            res.message("TIMEOUT ")
+
+        except exceptions.HTTPError as errh:
+            print(errh)
+            res.message("HTTPError ")
+
+        except exceptions.BaseException as e:
+            print(e)
+            res.message("BaseException ")
+
         except:
             res.message("Por Favor digite um numero válido")
             return str(res)
+        finally:
+            res.message(
+                f"Seu endereço: {address['logradouro']} - {address['bairro']}, {address['cidade']} - {address['uf']}, {address['cep']} \n {address['complemento']}")
+            users.update_one({"number": number}, {"$set": {"status": "ordered"}})
+            res.message("Digite 1 para voltar ao menu principal:")
         if option == 1:
             users.update_one({"number": number}, {"$set": {"status": "main"}})
             res.message(
@@ -123,5 +154,8 @@ def reply():
         users.update_one({"number": number}, {"$set": {"status": "main"}})
     users.update_one({"number": number}, {"$push": {"messages": {"text": text, "date": datetime.now()}}})
     return str(res)
-if __name__ == "__main__":
-    app.run(port=5000)
+
+if __name__ == '__main__':
+    app.run(debug=True,port= 5000)
+
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
