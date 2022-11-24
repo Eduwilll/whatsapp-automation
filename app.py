@@ -53,7 +53,7 @@ def reply():
             res.message("Digite seu cep")
         elif option == 5:
             users.update_one({"number": number}, {"$set": {"status": "main-reclama"}})
-            res.message("Digite com sua duvida e/ou reclamação")
+            res.message("Digite sua duvida e/ou reclamação.")
         elif option == 6:
             users.update_one({"number": number}, {"$set": {"status": "main-sair"}})
             res.message("Você poderia responder a umas questões?\n1️⃣ *Sim*\n*2️⃣ Apenas Sair*")
