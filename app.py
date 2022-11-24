@@ -99,14 +99,14 @@ def reply():
             res.message("Numa escala de 0 a 10 qual sua nota nosso atendimento via chatbot?")
         elif option == 2:
             users.delete_one({"number": number})
-            res.message("Obrigado por ter nos contato!😀🎈\nSeus dados Serão excluidos.")
+            res.message("Obrigado por ter nos contato!😀🎈\nDe acordo com a Lei Geral de Proteção de Dados Pessoais estaremos excluindo os seus dados.")
         else:
             res.message("Por Favor digite um numero válido:")
     elif user["status"] == "main-sair-nota":
         chatbot.insert_one({"number": number, "complaint": text, "name": profileName, "complaint_time": datetime.now()})
         users.delete_one({"number": number})
         res.message('Sua nota foi registrada.')
-        res.message("Obrigado por ter nos contato!😀🎈\nSeus dados Serão excluidos.")
+        res.message("Obrigado por ter nos contato!😀🎈\De acordo com a Lei Geral de Proteção de Dados Pessoais estaremos excluindo os seus dados.")
     elif user["status"] == "address":
 
         try:
