@@ -4,13 +4,71 @@ from pymongo import MongoClient
 from datetime import datetime
 from pycep_correios import get_address_from_cep, WebService, exceptions
 
+app = Flask(__name__)
+
+
 cluster = MongoClient("mongodb+srv://dbBot:admin@cluster0.yn32au7.mongodb.net/?retryWrites=true&w=majority") # endereço do mangodb
 db = cluster["salgados"] #Banco de dados
 users = db["users"] #Colletion user
 orders = db["orders"] #Colletion Orders
 complaints = db["complaint"]#Colletion complaint
 chatbot = db["chatbot"]#Colletion complaint
-app = Flask(__name__)
+
+def send_welcome_message(res, profileName):
+    msg = res.message(f"Oi *{profileName.capitalize()}*!😘, obrigado por nos contatar *Salgados S.A*\nVocê pode escolher uma das opções abaixo\n\n *Digite* o número correspondente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossas formas de *pagamento*. \n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer uma reclamação ou obter ajuda. \n6️⃣ Finalizar")
+    msg.media("https://i.ibb.co/tqYmh9R/1628253583441.jpg")
+    return msg
+
+def handle_main_menu(res, number, option, profileName):
+    if option == 1:
+        res.message("*Salgados S.A*\n*CNPJ*: 71.914.849/0001-19\n\nVocê pode nos contatar por telefone ou e-mail:\n\n*Telefone*: 1999111222\n*Email*: salgaldos@email.com.\n*Endereço*: Av. Andrade Neves, 1992 - Centro, Campinas - SP, 13013-161\n*Horário*: das *8:00* às *21:00*")
+    elif option == 2:
+        users.update_one({"number": number}, {"$set": {"status": "main-produto"}})
+        res.message("Para conhecer nossos produtos, digite:\n\n1️⃣ *Produtos*\n2️⃣ *Combos e Kits*\n3️⃣ *Promoções*\n4️⃣ *Retornar*")
+    elif option == 3:
+        res.message('As formas de pagamento são:\nDinheiro\nCartão de Crédito/Débito\nPIX')
+    elif option == 4:
+        users.update_one({"number": number}, {"$set": {"status": "address"}})
+        res.message("Digite seu CEP")
+    elif option == 5:
+        users.update_one({"number": number}, {"$set": {"status": "main-reclama"}})
+        res.message("Digite sua dúvida e/ou reclamação.")
+    elif option == 6:
+        users.update_one({"number": number}, {"$set": {"status": "main-sair"}})
+        res.message("Você poderia responder a algumas perguntas?\n1️⃣ *Sim*\n2️⃣ *Apenas Sair*")
+    else:
+        res.message("Por favor, digite um número válido")
+    return res
+
+def handle_address_status(res, number, text):
+    try:
+        option = int(text)
+        address = get_address_from_cep(text, webservice=WebService.APICEP)
+        if address is None:
+            res.message("CEP não encontrado ou inválido. Por favor, verifique o CEP e tente novamente.")
+        else:
+            res.message(
+                f"Seu endereço: {address['logradouro']} - {address['bairro']}, {address['cidade']} - {address['uf']}, {address['cep']} \n {address['complemento']}")
+            users.update_one({"number": number}, {"$set": {"status": "ordered"}})
+            res.message("Digite 1 para voltar ao menu principal:")
+
+    except exceptions.InvalidCEP as eic:
+        print(eic)
+        res.message("CEP inválido! Por favor, verifique o CEP e tente novamente.")
+    except exceptions.ConnectionError as errc:
+        print(errc)
+        res.message("Erro de conexão. Tente novamente mais tarde.")
+    except exceptions.Timeout as errt:
+        print(errt)
+        res.message("Tempo de conexão expirado. Tente novamente mais tarde.")
+    except exceptions.HTTPError as errh:
+        print(errh)
+        res.message("Erro de conexão. Tente novamente mais tarde.")
+    except ValueError:
+        res.message("Por favor, digite um número válido")
+    except Exception as e:
+        print(e)
+        res.message("Ocorreu um erro. Tente novamente mais tarde.")
 
 
 @app.route("/", methods=["get", "post"])
@@ -23,13 +81,11 @@ def reply():
     user = users.find_one({"number": number}) # atibuindo user o numero do user
     order = orders.find_one({"number": number})#
     complaint = complaints.find_one({"number": number})
-    message = Message()
-    print(request.values)
+    #print(f"Request values: {request.values}")
 
     #Caso não é encontrado o numero é acionado
     if bool(user) == False:
-        msg = res.message(f"Oi *{profileName.capitalize()}*!😘, obrigado por nos contatar *Salgados S.A*\nVocê pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar")
-        msg.media("https://i.ibb.co/tqYmh9R/1628253583441.jpg")
+        send_welcome_message(res, profileName)
         users.insert_one({"number": number,"ProfileName":profileName ,"channel":"whatsapp" ,"status": "main", "messages": []})
 
     #Chegando o Status do user, estados possiveis para user = main, ordering, address, ordered.
@@ -37,29 +93,10 @@ def reply():
         try:
             option = int(text)
         except:
-            res.message("Por Favor digite um numero válido")
+            res.message("Por Favor digite um numero válido!")
             return str(res)
-        if option == 1:
-            res.message("*Salgados S.A*\n*CNPJ*: 71.914.849/0001-19\n\nVocê pode nos contatar por Telefone ou E-mail:\n\n*Telefone*: 1999111222\n*Email*:salgaldos@email.com.\n*Endereço*: Av. Andrade Neves, 1992 - Centro, Campinas - SP, 13013-161\n *Horário*: das *8:00* às *21:00*");
+        handle_main_menu(res, number, option, profileName)
 
-        elif option == 2:
-            users.update_one({"number": number}, {"$set": {"status": "main-produto"}})
-            res.message("Para conhecer nosso produtos digite:\n\n1️⃣ *Produtos*\n2️⃣ *Combos e Kits*\n3️⃣ *Promoções*\n4️⃣*Retorna* ")
-
-        elif option == 3:
-            res.message('As formas de pagamento são:\nDinheiro\nCartão de Crétido/Débito\nPIX')
-        elif option == 4:
-            users.update_one({"number": number}, {"$set": {"status": "address"}})
-            res.message("Digite seu cep")
-        elif option == 5:
-            users.update_one({"number": number}, {"$set": {"status": "main-reclama"}})
-            res.message("Digite sua duvida e/ou reclamação.")
-        elif option == 6:
-            users.update_one({"number": number}, {"$set": {"status": "main-sair"}})
-            res.message("Você poderia responder a umas questões?\n1️⃣ *Sim*\n*2️⃣ Apenas Sair*")
-        else:
-            res.message("Por Favor digite um numero válido")
-        return str(res)
     elif user["status"] == "main-produto":
         try:
             option = int(text)
@@ -81,6 +118,7 @@ def reply():
         else:
             res.message("Por Favor digite um numero válido")
             return str(res)
+
     elif user["status"] == "main-reclama":
         complaints.insert_one({"number": number, "complaint": text, "name": profileName, "complaint_time": datetime.now()})
         res.message('Sua duvida/reclamação foi registrada.')
@@ -102,59 +140,22 @@ def reply():
             res.message("Obrigado por ter nos contato!😀🎈\nDe acordo com a Lei Geral de Proteção de Dados Pessoais estaremos excluindo os seus dados.")
         else:
             res.message("Por Favor digite um numero válido:")
+
     elif user["status"] == "main-sair-nota":
         chatbot.insert_one({"number": number, "complaint": text, "name": profileName, "complaint_time": datetime.now()})
         users.delete_one({"number": number})
         res.message('Sua nota foi registrada.')
-        res.message("Obrigado por ter nos contato!😀🎈\De acordo com a Lei Geral de Proteção de Dados Pessoais estaremos excluindo os seus dados.")
+        res.message("Obrigado por ter nos contato!😀🎈\n De acordo com a Lei Geral de Proteção de Dados Pessoais estaremos excluindo os seus dados.")
+
     elif user["status"] == "address":
+        handle_address_status(res, number, text)
 
-        try:
-            option = int(text)
-            address = get_address_from_cep(text, webservice=WebService.APICEP)
-
-        except exceptions.InvalidCEP as eic:
-            print(eic)
-            res.message("CEP *invalido!* ")
-
-        except exceptions.CEPNotFound as ecnf:
-            print(ecnf)
-            res.message("CEP NÃO ENCONTRADO! ")
-
-        except exceptions.ConnectionError as errc:
-            print(errc)
-            res.message("ERRO DE CONECÇÃO ")
-
-        except exceptions.Timeout as errt:
-            print(errt)
-            res.message("TIMEOUT ")
-
-        except exceptions.HTTPError as errh:
-            print(errh)
-            res.message("HTTPError ")
-
-        except exceptions.BaseException as e:
-            print(e)
-            res.message("BaseException ")
-
-        except:
-            res.message("Por Favor digite um numero válido")
-            return str(res)
-        finally:
-            res.message(
-                f"Seu endereço: {address['logradouro']} - {address['bairro']}, {address['cidade']} - {address['uf']}, {address['cep']} \n {address['complemento']}")
-            users.update_one({"number": number}, {"$set": {"status": "ordered"}})
-            res.message("Digite 1 para voltar ao menu principal:")
-        if option == 1:
-            users.update_one({"number": number}, {"$set": {"status": "main"}})
-            res.message(
-                "Você pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso *menu*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda. \n6️⃣ Finalizar")
     elif user['status'] == "ordered":
         res.message(f"Oi, obrigado por nos contatar novamente *{profileName.capitalize()}*!😘\n Você pode escolher uma das opções abaixo\n\n *Digite* o numero correspodente:\n\n1️⃣  Para saber nosso *endereço* e *horário*. \n2️⃣  Para conhecer nosso menu de *salgados*.\n3️⃣  Para saber nossa formas de *pagamento*.\n4️⃣  Para saber a taxa de *entrega*. \n5️⃣ Fazer Reclamação ou Ajuda \n6️⃣ Finalizar")
         users.update_one({"number": number}, {"$set": {"status": "main"}})
     users.update_one({"number": number}, {"$push": {"messages": {"text": text, "date": datetime.now()}}})
+
     return str(res)
 
 if __name__ == '__main__':
-    app.run()
-
+    app.run(debug=True)
