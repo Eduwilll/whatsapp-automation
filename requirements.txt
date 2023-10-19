@@ -2,5 +2,5 @@ flask
 twilio
 pymongo
 dnspython
-pycep-correios
+pycep-correios==5.1.0
 gunicorn
