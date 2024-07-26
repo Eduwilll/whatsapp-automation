@@ -4,4 +4,4 @@ pymongo
 dnspython
 pycep-correios==5.1.0
 gunicorn
-brazilcep
+brazilcep==6.3.1
