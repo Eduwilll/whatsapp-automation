@@ -3,7 +3,7 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse, Message
 from pymongo import MongoClient
 from datetime import datetime
-from pycep-correios import get_address_from_cep, WebService, exceptions
+from pycep_correios import get_address_from_cep, WebService, exceptions
 from dotenv import load_dotenv
 from functools import wraps
 
