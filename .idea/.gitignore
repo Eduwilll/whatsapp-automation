@@ -1,0 +1,39 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+#Ambientes virtuais
+venv/
+env/
+*.pyc
+
+# Arquivos de configuração
+.env
+
+# Logs
+*.log
+
+# Arquivos de cache
+__pycache__/
+.pytest_cache/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.swp
+*~
