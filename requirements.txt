@@ -4,5 +4,4 @@ pymongo
 dnspython
 pycep-correios==5.1.0
 gunicorn
-
-
+python-dotenv
