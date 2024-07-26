@@ -2,7 +2,8 @@ flask
 twilio
 pymongo
 dnspython
+brazilcep==6.2.0
 pycep-correios==5.1.0
 gunicorn
-brazilcep
+
 
