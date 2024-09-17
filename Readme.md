@@ -1,3 +1,5 @@
+![Interface do Chatbot](https://i.imgur.com/V7PIfBm.png)
+
 # Chatbot para Loja de Salgados - LLAS Coxitas S/A
 
 Este projeto tem como objetivo desenvolver um **chatbot** para auxiliar no atendimento aos clientes de uma loja de salgados, automatizando a comunicação via WhatsApp e Telegram.
@@ -106,6 +108,59 @@ A **LLAS Coxitas S/A** é uma empresa familiar que, após a pandemia, resolveu d
 - Adição de um sistema de recomendações personalizadas com base no histórico de pedidos dos clientes.
 - Melhoria do processamento de linguagem natural (NLP) para respostas mais dinâmicas e interativas, utilizando modelos como o GPT.
 - Integração com serviços de entrega para fornecer acompanhamento em tempo real dos pedidos.
+## Colaboradores
+
+Colaboradores que contribuíram para o projeto:
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/LuisKakimoto">
+        <img src="https://avatars.githubusercontent.com/u/84325208?v=4" width="100px;" alt="username1"/>
+        <br />
+        <sub><b>Luis Kakimoto</b></sub>
+      </a>
+      <br />
+      Gerente de Projetos 
+    </td>
+    <td align="center">
+      <a href="https://github.com/lpfnascimento">
+        <img src="https://avatars.githubusercontent.com/u/77133052?v=4" width="100px;" alt="username2"/>
+        <br />
+        <sub><b>Liliane Paulino</b></sub>
+      </a>
+      <br />
+      Scrum Master
+    </td>
+    <td align="center">
+      <a href="https://github.com/ESMERALDOJr">
+        <img src="https://avatars.githubusercontent.com/u/78826768?v=4" width="100px;" alt="username1"/>
+        <br />
+        <sub><b>Esmeraldo Junior</b></sub>
+      </a>
+      <br />
+      PO & Tester 
+    </td>
+    <td align="center">
+      <a href="https://github.com/SamuelAlves977">
+        <img src="https://avatars.githubusercontent.com/u/56982347?v=4" width="100px;" alt="username2"/>
+        <br />
+        <sub><b>Samuel Alves</b></sub>
+      </a>
+      <br />
+       Tester & DevOps
+    </td>
+    <td align="center">
+      <a href="https://github.com/Eduwilll">
+        <img src="https://avatars.githubusercontent.com/u/75496627?v=4" width="100px;" alt="username2"/>
+        <br />
+        <sub><b>Eduardo Fabricio</b></sub>
+      </a>
+      <br />
+      Developer & DevOps
+    </td>
+  </tr>
+</table>
 
 ## Licença
 Este projeto está licenciado sob a licença MIT. Consulte o arquivo LICENSE para mais detalhes.
